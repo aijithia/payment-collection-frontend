@@ -1,98 +1,102 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import React, { useState } from "react";
+import { View, Text, TextInput, Button, StyleSheet } from "react-native";
+import axios from "axios";
+import { API_BASE_URL } from "../../constants/api";
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+export default function Home() {
+  const [accountNumber, setAccountNumber] = useState("");
+  const [customer, setCustomer] = useState(null);
+  const [paymentAmount, setPaymentAmount] = useState("");
 
-export default function HomeScreen() {
+  const fetchCustomer = async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/customers`);
+      const foundCustomer = response.data.find(
+        (c) => c.account_number === accountNumber
+      );
+      if (foundCustomer) {
+        setCustomer(foundCustomer);
+      } else {
+        alert("Customer not found");
+        setCustomer(null);
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Error fetching data");
+    }
+  };
+
+  const makePayment = async () => {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/payments`,
+        {  
+          account_number: accountNumber,
+          payment_amount: paymentAmount
+        }
+      );
+      alert("Payment Successful!");
+      setPaymentAmount("");
+    } catch (error) {
+      console.error(error);
+      alert("Payment failed");
+    }
+  };
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+    <View style={styles.container}>
+      <Text style={styles.title}>Payment Collection App</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Enter Account Number"
+        value={accountNumber}
+        onChangeText={setAccountNumber}
+      />
+      <Button title="Get Loan Details" onPress={fetchCustomer} />
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+      {customer && (
+        <View style={styles.card}>
+          <Text>Account: {customer.account_number}</Text>
+          <Text>Issue Date: {new Date(customer.issue_date).toLocaleDateString()}</Text>          <Text>Interest Rate: {customer.interest_rate}%</Text>
+          <Text>Tenure: {customer.tenure} months</Text>
+          <Text>EMI Due: ₹{customer.emi_due}</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter Payment Amount"
+            value={paymentAmount}
+            onChangeText={setPaymentAmount}
+          />
+          <Button title="Pay EMI" onPress={makePayment} />
+        </View>
+      )}
+    </View>
+    
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    padding: 20,
+    backgroundColor: "white"
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
+    textAlign: "center"
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    padding: 10,
+    marginBottom: 10,
+    borderRadius: 5
   },
+  card: {
+    marginTop: 20,
+    padding: 15,
+    backgroundColor: "#f2f2f2",
+    borderRadius: 8
+  }
 });
