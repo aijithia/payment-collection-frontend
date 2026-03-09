@@ -28,11 +28,13 @@ http://localhost:5000/api
 
 ## Run Frontend Locally
 
-Install dependencies:
+Install dependencies: 
 npm install
-Start Expo:
+
+Start Expo: 
 npx expo start --web
-Open browser:
+
+Open browser: 
 http://localhost:8081
 
 ## Author
