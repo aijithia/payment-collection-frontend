@@ -1,42 +1,55 @@
 # Payment Collection App - Frontend
 
-This is the frontend mobile/web interface for the Payment Collection App built using **React Native (Expo)**.
+This is the frontend for the **Payment Collection App** built using **React Native (Expo)**.
 
 ## Tech Stack
-
 - React Native
 - Expo
 - Axios
 
 ## Features
-
 - Enter account number
-- Fetch loan details
+- Fetch loan details from backend API
 - Display:
-  - Account number
-  - Issue date
-  - Interest rate
+  - Account Number
+  - Issue Date
+  - Interest Rate
   - Tenure
-  - EMI due
-- Pay EMI
-- Show payment success confirmation
+  - EMI Due
+- Enter EMI payment amount
+- Submit EMI payment
+- Display payment success confirmation
 
 ## Backend API
 
-The frontend connects to the backend API:
+The frontend connects to the backend server:
+
+
 http://localhost:5000/api
+
+
+Available endpoints:
+
+
+GET /api/customers
+POST /api/payments
+GET /api/payments/:account_number
+
 
 ## Run Frontend Locally
 
-Install dependencies: 
+Install dependencies:
 npm install
 
-Start Expo: 
+
+Start the Expo development server:
 npx expo start --web
 
-Open browser: 
+
+Open the application in the browser:
 http://localhost:8081
+
 
 ## Author
 
-Aijithia 
+Aijithia Jacob
